@@ -1,0 +1,48 @@
+﻿@using Sanmol_Software_Assessment_AspDotNetCore_MVC.Enums;
+@using Sanmol_Software_Assessment_AspDotNetCore_MVC.ViewModels;
+@model EditSingleTaskItem
+
+<h3 class="mb-4">Edit Task</h3>
+
+<form asp-action="Edit" method="post" asp-antiforgery="true" class="row g-3">
+    <input asp-for="Id" type="hidden" />
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" type="date" class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Priority" class="form-label"></label>
+        <select asp-for="Priority"
+                asp-items="Html.GetEnumSelectList<ConstantDataSets.Priority>()"
+                class="form-select"></select>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status"
+                asp-items="Html.GetEnumSelectList<ConstantDataSets.TaskCurrentStatus>()"
+                class="form-select"></select>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">Customer</label>
+        <p class="form-control-plaintext">@Model.CustomerName</p>
+    </div>
+
+    <div class="col-12 mt-2">
+        <button type="submit" class="btn btn-success px-4">Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

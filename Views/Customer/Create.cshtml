@@ -1,0 +1,127 @@
+﻿@using Sanmol_Software_Assessment_AspDotNetCore_MVC.ViewModels;
+@using Sanmol_Software_Assessment_AspDotNetCore_MVC.Enums;
+@model CustomerWithTasksVM
+<h2 class="mb-4">CREATE NEW CUSTOMER</h2>
+<form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" asp-antiforgery="true">
+    <div class="row g-3">
+
+        <input asp-for="Id" type="hidden" />
+
+        <div class="col-md-6">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+        </div>
+
+        <div class="col-12 form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+
+        <hr />
+
+        <!-- tasks table -->
+        <h5>Tasks</h5>
+        <table class="table" id="tblTasks">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th style="width:160px">Due&nbsp;Date</th>
+                    <th style="width:120px">Priority</th>
+                    <th style="width:120px">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.Tasks.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input name="Tasks[@i].Description" value="@Model.Tasks[i].Description" class="form-control" />
+                            <input name="Tasks[@i].Id" value="@Model.Tasks[i].Id" type="hidden" />
+                            <span asp-validation-for="Tasks[@i].Description" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input name="Tasks[@i].DueDate" value="@Model.Tasks[i].DueDate?.ToString("yyyy-MM-dd")" type="date" class="form-control" />
+                            <span asp-validation-for="Tasks[@i].DueDate" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <select name="Tasks[@i].Priority" class="form-select">
+                                @foreach (var p in Enum.GetValues(typeof(ConstantDataSets.Priority)))
+                                {
+                                    <option value="@p" selected="@(p.Equals(Model.Tasks[i].Priority))">@p</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <select name="Tasks[@i].Status" class="form-select">
+                                @foreach (var s in Enum.GetValues(typeof(ConstantDataSets.TaskCurrentStatus)))
+                                {
+                                    <option value="@s" selected="@(s.Equals(Model.Tasks[i].Status))">@s</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="button" id="btnAddRow" class="btn btn-outline-primary mb-3">+ Add task</button>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+                // keep track of next index
+                let rowIndex = @Model.Tasks.Count;
+
+                $('#btnAddRow').click(function () {
+                    $('#tblTasks tbody').append(`
+        <tr>
+          <td>
+            <input name="Tasks[${rowIndex}].Description" class="form-control" />
+            <input name="Tasks[${rowIndex}].Id" value="0" type="hidden" />
+          </td>
+          <td><input name="Tasks[${rowIndex}].DueDate" type="date" class="form-control" /></td>
+          <td>
+              <select name="Tasks[${rowIndex}].Priority" class="form-select">
+                  <option value="0">Low</option>
+                  <option value="1" selected>Medium</option>
+                  <option value="2">High</option>
+              </select>
+          </td>
+          <td>
+              <select name="Tasks[${rowIndex}].Status" class="form-select">
+                  <option value="0" selected>Pending</option>
+                  <option value="1">Completed</option>
+              </select>
+          </td>
+        </tr>`);
+                    rowIndex++;
+                });
+    </script>
+}

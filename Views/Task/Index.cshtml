@@ -1,0 +1,92 @@
+﻿@using Sanmol_Software_Assessment_AspDotNetCore_MVC.ViewModels;
+@using Sanmol_Software_Assessment_AspDotNetCore_MVC.Enums;
+@model AllTaskVM
+
+@{
+    ViewData["Title"] = "Tasks";
+    Layout = "_Layout";
+}
+<h2 class="mb-4">Tasks</h2>
+<form method="get" class="d-flex align-items-end gap-3 mb-4">
+    <div>
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select" style="min-width:180px">
+            <option value="">-- All --</option>
+            @foreach (ConstantDataSets.TaskCurrentStatus s in Enum.GetValues(typeof(ConstantDataSets.TaskCurrentStatus)))
+            {
+                <option value="@s"
+                        selected="@(s == Model.FilterStatus)">
+                    @s
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary px-4 mb-1">Filter</button>
+
+    @* show “Clear” only when a filter is active *@
+    @if (Model.FilterStatus != null)
+    {
+        <a asp-action="Index" class="btn btn-outline-secondary mb-1">Clear</a>
+    }
+</form>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Description</th>
+            <th style="width:130px">Due&nbsp;Date</th>
+            <th style="width:90px">Priority</th>
+            <th style="width:110px">Status</th>
+            <th>Customer</th>
+            <th style="width:100px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Tasks)
+        {
+            <tr>
+                <td>@t.Description</td>
+                <td>@t.DueDate?.ToString("yyyy‑MM‑dd")</td>
+                <td>@t.Priority</td>
+                <td>
+                    @{
+                        string badgeClass = t.Status switch
+                        {
+                            ConstantDataSets.TaskCurrentStatus.Pending => "bg-warning text-dark",
+                            ConstantDataSets.TaskCurrentStatus.Completed => "bg-success",
+                            _ => "bg-secondary"
+                        };
+                    }
+                    <span class="badge @badgeClass">@t.Status</span>
+                </td>
+
+                <td>
+                    <a asp-controller="Customer"
+                       asp-action="Edit"
+                       asp-route-id="@t.CustomerId">
+                        @t.CustomerName
+                    </a>
+                </td>
+
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@t.Id"
+                       class="btn btn-sm btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+        @if (!Model.Tasks.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted">No tasks found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex justify-content-center gap-3 mb-4">
+    <a asp-controller="Dashboard"
+       asp-action="Index"
+       class="btn btn-outline-primary px-4">
+        + Go To Dashboard
+    </a>
+</div>

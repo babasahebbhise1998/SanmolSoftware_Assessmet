@@ -1,0 +1,132 @@
+﻿@using Sanmol_Software_Assessment_AspDotNetCore_MVC.ViewModels;
+@model IEnumerable<CustomerWithTasksVM>   // the VM we used earlier
+@{
+    ViewData["Title"] = "ALL CUSTOMERS";
+    Layout = "_Layout";
+}
+@{
+    // read back the last search so the inputs stay filled
+    var currentName = (string?)ViewData["NameSearch"] ?? "";
+    var currentPhone = (string?)ViewData["PhoneSearch"] ?? "";
+}
+
+<!-- Search bar -->
+<form method="get" class="d-flex justify-content-center gap-3 mb-4">
+    <input type="text"
+           name="name"
+           value="@currentName"
+           class="form-control w-auto"
+           placeholder="Search by name" />
+
+    <input type="text"
+           name="phone"
+           value="@currentPhone"
+           class="form-control w-auto"
+           placeholder="Search by phone" />
+
+    <button type="submit" class="btn btn-primary px-4">
+        Filter
+    </button>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        Clear
+    </a>
+</form>
+<h2>Customers</h2>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Active?</th>
+            <th>Tasks&nbsp;<span class="text-muted"></span></th>
+            <th style="width:130px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.Phone</td>
+                <td>@c.Email</td>
+                <td>@(c.IsActive ? "✔️" : "❌")</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#tasks-@c.Id">
+                        Show / Hide (@c.Tasks.Count)
+                    </button>
+
+                    <div id="tasks-@c.Id" class="collapse mt-2">
+                        <table class="table table-sm">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Description</th>
+                                    <th style="width:120px">Due&nbsp;Date</th>
+                                    <th style="width:100px">Priority</th>
+                                    <th style="width:100px">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var t in c.Tasks)
+                                {
+                                    <tr>
+                                        <td>@t.Description</td>
+                                        <td>@t.DueDate?.ToString("yyyy‑MM‑dd")</td>
+                                        <td>@t.Priority</td>
+                                        <td>@t.Status</td>
+                                    </tr>
+                                }
+                                @if (!c.Tasks.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-muted text-center">
+                                            No tasks
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+
+                    <form asp-action="Delete" asp-route-id="@c.Id"
+                          method="post" class="d-inline"
+                          onsubmit="return confirmDelete()">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex justify-content-center gap-3 mb-4">
+    <a asp-controller="Customer"
+       asp-action="Create"
+       class="btn btn-success">
+        + Add Customer
+    </a>
+
+    <a asp-controller="Dashboard"
+       asp-action="Index"
+       class="btn btn-outline-primary px-4">
+        + Go To Dashboard
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete this customer?");
+        }
+    </script>
+}

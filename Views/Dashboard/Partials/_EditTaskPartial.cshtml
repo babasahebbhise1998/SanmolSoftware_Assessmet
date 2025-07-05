@@ -1,0 +1,33 @@
+﻿@model Sanmol_Software_Assessment_AspDotNetCore_MVC.ViewModels.EditTaskVM
+@using static Sanmol_Software_Assessment_AspDotNetCore_MVC.Enums.ConstantDataSets
+
+<form asp-action="EditTask" asp-controller="Dashboard" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Description</label>
+        <p class="form-control-plaintext">@Model.Description</p>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label fw-semibold"></label>
+        @* Only Pending tasks can be changed *@
+        @if (Model.Status == TaskCurrentStatus.Pending)
+        {
+            <select asp-for="Status"
+                    asp-items="Html.GetEnumSelectList<TaskCurrentStatus>()"
+                    class="form-select"></select>
+        }
+        else
+        {
+            <p class="form-control-plaintext">@Model.Status</p>
+            <input asp-for="Status" type="hidden" />
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary"
+            disabled="@(Model.Status != TaskCurrentStatus.Pending)">
+        Save
+    </button>
+</form>
